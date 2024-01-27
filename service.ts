@@ -43,6 +43,6 @@ app.listen(HTTP_PORT, () => {
 });
 
 // CRON JOB to fetch Videos from Youtube V3 API and Save in the Database
-// fetchVideosAndSaveInDatabase();
+fetchVideosAndSaveInDatabase();
 
 module.exports = app;
