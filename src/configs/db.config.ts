@@ -10,7 +10,7 @@ const MONGO_AUTH_DB = process.env.MONGO_AUTH_DB;
  Creating the MongoDB Database connection
 */
 mongoose.Promise = global.Promise;
-const MONGO_URI = `mongodb://localhost:${MONGO_PORT}/${MONGO_AUTH_DB}`
+const MONGO_URI = `mongodb://localhost:${MONGO_PORT}/${MONGO_AUTH_DB}`;
 
 // Connecting to Mongo Database
 mongoose.connect(
