@@ -1,25 +1,50 @@
 require("dotenv").config();
-import { VideoSchemaDTO } from "../models/video.model";
-const dbConn = require("../configs/db.config");
+import {VideoModel} from "../models/video.model";
+import VideoSchema from "../models/video.schema";
 
 export class VideoQueries {
+
   /*
     Saving/Inserting the data in the database.
   */
-  public static VideoModelCreateQuery = async (data: typeof VideoSchemaDTO) => {
-      // TO:DO :: LOGIC TO SAVE VIDEO MODEL
+  public static insertVideoDataInDatabase = async (data: any[]) => {
+    try {
+		await VideoSchema.insertMany(data);
+		return {
+			status: "success",
+			message: "Error while inserting all data"
+		};
+    } catch (err: any) {
+      console.error("Error while saving data in DB, " + err?.message)
+    }
   };
 
   /* 
     Fetching all the videos as per the search query and responding as the paginated response.
   */
   public static getVideosByAnyKeyQueryResponse = async (
-    pageNumber: number,
-    pageSize: number,
-    sortByOrder: string,
-    sortByKey: string
+    pageNumber: number = 1,
+    pageSize: number = 10,
+    sortByOrder: string = "desc",
+    sortByKey: string = "createdAt"
   ) => {
-    // TO:DO :: LOGIC TO GET VIDEOS BY KEY QUERY
+	try {
+		const numberOfRecords = await VideoSchema.countDocuments(); // count the number of records for that model
+		if (Number(pageSize) * (Number(pageNumber) - 1) > numberOfRecords) {
+			return { status: "error", data: "Error Pagesize or pageNumber" };
+		}
+		const data = await VideoSchema
+			.find()
+			.sort((sortByOrder.includes("desc") ? "-" : "") + sortByKey)
+			.skip(Number(pageSize) * (Number(pageNumber) - 1))
+			.limit(Number(pageSize));
+		return {
+			data,
+			numberOfRecords
+		};
+	} catch (err: any) {
+		console.error(err)
+	}
   };
 
   /*
@@ -29,12 +54,30 @@ export class VideoQueries {
   */
   public static VideoModelGetByTitleOrDescriptionQuery = async (
     searchString: String,
-    pageNumber: number,
-    pageSize: number,
-    sortByOrder: string,
-    sortByKey: string
+    pageNumber: number = 1,
+    pageSize: number = 10,
+    sortByOrder: string = "desc",
+    sortByKey: string = "publishTime"
   ) => {
-    // TO:DO :: LOGIC TO GET VIDEOS BY TITLE OR DESCRIPTION
+	try {
+		const numberOfRecords = await VideoSchema.countDocuments(); // count the number of records for that model
+		if (Number(pageSize) * (Number(pageNumber) - 1) > numberOfRecords) {
+			return { status: "error", data: "Error Pagesize or pageNumber" };
+		}
+		const data = await VideoSchema
+			.find({$or:[
+				{ title: { "$regex": searchString, "$options": "i" } }, { description: { "$regex": searchString, "$options": "i" } }
+			]})
+			.sort((sortByOrder.includes("desc") ? "-" : "") + sortByKey)
+			.skip(Number(pageSize) * (Number(pageNumber) - 1))
+			.limit(Number(pageSize));
+		return {
+			data,
+			numberOfRecords
+		};
+	} catch (err: any) {
+		console.error(err)
+	}
   }
 }
 

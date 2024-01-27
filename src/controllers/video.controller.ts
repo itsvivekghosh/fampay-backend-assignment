@@ -20,12 +20,12 @@ class VideoController {
   }
 
   // Getting the Video Details from the Youtube API.
-  public static async getVideoResponse(request: Request, response: Response) {
+  public static async getVideoResponse(request: Request, _: Response) {
     const searchParams = request?.query?.q || process.env.DEFAULT_SEARCH_VALUE;
     const sortByOrder = request?.query?.sortByOrder || "desc";
     const pageNumber = request?.query?.pageNumber || 1;
     const pageSize =
-      request?.query?.pageSize || Number(process.env.DEFAULT_PAGE_SIZE);
+      request?.query?.pageSize ? Number(request?.query?.pageSize) : Number(process.env.DEFAULT_PAGE_SIZE);
 
     if (!this.checkTheSortOrderValueMatches(String(sortByOrder))) {
       const errorMessage = `Wrong key for SORT_ORDER used as ${sortByOrder}`;
@@ -74,9 +74,9 @@ class VideoController {
   public static async getAllVideoResponse(request?: Request, _?: Response) {
     const sortByOrder = request?.query?.sortByOrder || "desc";
     const pageNumber = request?.query?.pageNumber || 1;
-    const sortByKey = request?.query?.sortByKey;
+    const sortByKey = request?.query?.sortByKey || "publishTime";
     const pageSize =
-      request?.query?.pageSize || Number(process.env.DEFAULT_PAGE_SIZE);
+      request?.query?.pageSize ? Number(request?.query?.pageSize) : Number(process.env.DEFAULT_PAGE_SIZE);
 
     if (!this.checkTheSortOrderValueMatches(String(sortByOrder))) {
       const errorMessage = `wrong key for SORT_ORDER used as ${sortByOrder}`;
@@ -114,11 +114,18 @@ class VideoController {
     request: Request,
     _: Response
   ) {
-    const pageNumber = request?.query?.pageNumber;
-    const pageSize = request?.query?.pageSize;
+    const pageNumber = request?.query?.pageNumber || 1;
+    const pageSize = request?.query?.pageSize || 10;
     const searchQuery = request?.query?.searchQuery;
-    const sortByOrder = request?.query?.sortByOrder;
-    const sortByKey = request?.query?.sortByKey;
+    const sortByOrder = request?.query?.sortByOrder || "desc";
+    const sortByKey = request?.query?.sortByKey || "publishTime";
+
+    if (!searchQuery) {
+      return {
+        status: "error",
+        message: "Invalid Query",
+      };
+    }
 
     if (!this.checkTheSortOrderValueMatches(String(sortByOrder))) {
       const errorMessage = `wrong key for SORT_ORDER used as ${sortByOrder}`;

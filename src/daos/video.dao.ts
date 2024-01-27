@@ -1,7 +1,7 @@
 require("dotenv").config();
 import axios, { AxiosError } from "axios";
 
-const VideoQueries = require("../models/video.model");
+const VideoQueries = require("../queries/video.query");
 
 class VideoHelper {
   static apiKey = process.env.YOUTUBE_API_KEY;
@@ -161,9 +161,13 @@ class VideoHelper {
   */
   static async saveDataInDatabase(VideoObjectList: any[]) {
     try {
-      VideoObjectList.forEach(async (VideoObject: any) => {
-        await VideoQueries.VideoModelCreateQuery(VideoObject);
-      });
+      const result = await VideoQueries.insertVideoDataInDatabase(VideoObjectList);
+      if (result?.status !== "success") {
+        return {
+          status: "error",
+          message: result?.message,
+        };
+      }
 
       return {
         status: "success",

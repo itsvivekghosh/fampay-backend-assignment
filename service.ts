@@ -1,5 +1,5 @@
 require("dotenv").config();
-require("./src/configs/db.config"); // INIT Mongo DB
+require("./src/configs/db.config"); // Initialize Mongo DB
 
 import express, { NextFunction, Request, Response } from "express";
 import bodyParser from "body-parser";
@@ -43,6 +43,6 @@ app.listen(HTTP_PORT, () => {
 });
 
 // CRON JOB to fetch Videos from Youtube V3 API and Save in the Database
-fetchVideosAndSaveInDatabase();
+// fetchVideosAndSaveInDatabase();
 
 module.exports = app;
