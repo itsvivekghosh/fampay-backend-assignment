@@ -1,0 +1,165 @@
+{
+	"info": {
+		"_postman_id": "49e04339-0edf-4e40-be8e-ab4174b2911d",
+		"name": "fampay-assignment",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET Video by Title OR Description",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true,
+					"user-agent": true,
+					"accept-encoding": true,
+					"connection": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/video/getByTitleOrDescription?sortByOrder=desc&sortByKey=publishTime&pageNumber=1&pageSize=10&searchQuery=virat",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"video",
+						"getByTitleOrDescription"
+					],
+					"query": [
+						{
+							"key": "sortByOrder",
+							"value": "desc"
+						},
+						{
+							"key": "sortByKey",
+							"value": "publishTime"
+						},
+						{
+							"key": "pageNumber",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "10"
+						},
+						{
+							"key": "searchQuery",
+							"value": "virat"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Videos from Youtube",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true,
+					"user-agent": true,
+					"accept-encoding": true,
+					"connection": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/video?pageNumber=1&pageSize=4&sortByOrder=desc&q=virat kohli",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"video"
+					],
+					"query": [
+						{
+							"key": "pageNumber",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "4"
+						},
+						{
+							"key": "sortByOrder",
+							"value": "desc"
+						},
+						{
+							"key": "q",
+							"value": "virat kohli"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET All Videos",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true,
+					"user-agent": true,
+					"accept-encoding": true,
+					"connection": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/video/getAllVideos?sortByKey=publishTime&sortByOrder=asc&pageSize=3&pageNumber=1",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"video",
+						"getAllVideos"
+					],
+					"query": [
+						{
+							"key": "sortByKey",
+							"value": "publishTime"
+						},
+						{
+							"key": "sortByOrder",
+							"value": "asc"
+						},
+						{
+							"key": "pageSize",
+							"value": "3"
+						},
+						{
+							"key": "pageNumber",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
