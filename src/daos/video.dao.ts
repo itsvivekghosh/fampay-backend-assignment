@@ -4,6 +4,7 @@ import axios, { AxiosError } from "axios";
 const VideoQueries = require("../queries/video.query");
 
 class VideoHelper {
+  
   static apiKey = process.env.YOUTUBE_API_KEY;
   static apiUrl = process.env.YOUTUBE_API_URL;
   static maxResults = Number(process.env.MAX_FETCH_RESULTS);
@@ -253,14 +254,14 @@ class VideoHelper {
       );
 
       if (response?.status !== "error") {
-        response?.map((data: any) => {
+        response?.data?.map((data: any) => {
           data.thumbnails = JSON.parse(data?.thumbnails);
           // delete data?.created_at;
         });
 
         return {
           status: "success",
-          data: response,
+          data: response?.data,
         };
       } else {
         return response;
@@ -295,12 +296,12 @@ class VideoHelper {
         sortByOrder,
         sortByKey
       );
-      response?.map((data: any) => {
+      response?.data?.map((data: any) => {
         data.thumbnails = JSON.parse(data?.thumbnails);
       });
       return {
         status: "success",
-        data: response,
+        data: response?.data,
       };
     } catch (error: any) {
       const errorMessage = `ERROR while getting the response from DB, Cause: ${JSON.stringify(
