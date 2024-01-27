@@ -1,21 +1,5 @@
 import { model, Schema } from "mongoose"
 
-
-const thumbnailsModel = new Schema({
-  url: {
-    type: String,
-    required: true
-  },
-  width: {
-    type: Number,
-    required: true
-  },
-  height: {
-    type: Number,
-    required: true
-  }
-});
-
 const VideoSchema: Schema = new Schema({
     title: {
       type: String,
@@ -46,9 +30,8 @@ const VideoSchema: Schema = new Schema({
       required: true
     },
     thumbnails: {
-      default: thumbnailsModel,
-      medium: thumbnailsModel,
-      high: thumbnailsModel
+      type: Object,
+      required: true
     }
   }
 );

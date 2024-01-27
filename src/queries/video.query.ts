@@ -12,7 +12,7 @@ export class VideoQueries {
 		await VideoSchema.insertMany(data);
 		return {
 			status: "success",
-			message: "Error while inserting all data"
+			message: "Successfully Inserted data in DB"
 		};
     } catch (err: any) {
       console.error("Error while saving data in DB, " + err?.message)
@@ -39,6 +39,7 @@ export class VideoQueries {
 			.skip(Number(pageSize) * (Number(pageNumber) - 1))
 			.limit(Number(pageSize));
 		return {
+			status: "success",
 			data,
 			numberOfRecords
 		};
@@ -72,6 +73,7 @@ export class VideoQueries {
 			.skip(Number(pageSize) * (Number(pageNumber) - 1))
 			.limit(Number(pageSize));
 		return {
+			status: "success",
 			data,
 			numberOfRecords
 		};

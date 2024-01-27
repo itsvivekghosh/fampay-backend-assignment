@@ -6,10 +6,28 @@ services:
         ports:
             - 3000:3000
         environment:
+            # Youtube Config
             YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+            YOUTUBE_API_URL: ${YOUTUBE_API_URL}
+
+            # Mongo Config
             MONGODB_URI: ${MONGODB_URI}
+            MONGO_PORT: ${MONGO_PORT}
+            MONGO_AUTH_DB: ${MONGO_AUTH_DB}
+            MONGODB_URL: ${MONGODB_URL}
+
+            # HTTP Config
+            HTTP_PORT: ${HTTP_PORT}
+
+            # Logical Config
+            DEFAULT_SEARCH_VALUE: ${DEFAULT_SEARCH_VALUE}
+            DEFAULT_PAGE_SIZE: ${DEFAULT_PAGE_SIZE}
+            CRON_SCHEDULE_TIME: ${CRON_SCHEDULE_TIME}
+            MAX_FETCH_RESULTS: ${MAX_FETCH_RESULTS}
+
         depends_on: 
             - mongo
+
     mongo:
         image: mongo
         restart: always
