@@ -26,32 +26,50 @@ class VideoHelper {
       if (this.apiKey) {
         // Handled multiple YOUTUBE_API_KEYS if the key is expired
         this.apiKey = this.apiKey.replace(/\s/g, "");
+        let isError: boolean = false;
+        let errorMessage: String = "";
+        let quotaFull: boolean = false;
 
         for (const apiKey of this.apiKey?.split(",")) {
           const YOUTUBE_FETCH_API_URL = `${this.apiUrl}/search?key=${apiKey}&type=video&part=snippet&maxResults=${this.maxResults}&q=${searchQuery}`;
-
           response = await axios(YOUTUBE_FETCH_API_URL).catch(
             (reason: AxiosError<any>) => {
               if (reason.response!.status === 400) {
                 // Handle 400
-                const errorMessage = `Getting Error while using the API_KEY: ${apiKey}, STATUS: ${
+                errorMessage = `Getting Error while using the API_KEY: ${apiKey}, STATUS: ${
                   reason.response!.status
                 }, ERROR: ${reason?.message}`;
                 console.error(errorMessage);
-                return {
-                  status: "error",
-                  message: errorMessage,
-                };
+                isError = true;
+              } else if (reason?.response!.status === 403) {
+                // Handle 400
+                errorMessage = `${
+                  reason.response!.status
+                } ERROR, Cause: ${reason?.response?.data?.error?.message}`;
+                console.error(errorMessage);
+                quotaFull = true;
+                isError = true;
               }
             }
           );
+
           if (response?.status === 200) {
+            quotaFull = false;
+            isError = false;
             break;
           }
-          if (!response?.data && !response?.data?.items) {
+
+          if (quotaFull) {
             // This block handles that if the data items are empty then, search with next apiKey
             continue;
           }
+
+        }
+        if (isError || quotaFull) {
+          return {
+            status: "error",
+            message: errorMessage,
+          };
         }
       } else {
         const errorMessage = `No API Keys, Please provide a valid 'YOUTUBE_API_KEY'`;
@@ -297,7 +315,6 @@ class VideoHelper {
     sortByKey: string
   ) => {
     try {
-      
       let response: any = {};
       if (searchString) {
         const cachedResult = await redisClient.get(searchString.toLowerCase());
@@ -311,32 +328,31 @@ class VideoHelper {
               data: "Can't Parse JSON Body, Cause: " + err?.message,
             };
           }
-        }
-      }
-      else {
-        response = await VideoQueries.VideoModelGetByTitleOrDescriptionQuery(
-          searchString,
-          pageNumber,
-          pageSize,
-          sortByOrder,
-          sortByKey
-        );
-        response?.data?.map((data: any) => {
-          data.thumbnails = JSON.parse(data?.thumbnails);
-        });
-      };
+        } else {
+          response = await VideoQueries.VideoModelGetByTitleOrDescriptionQuery(
+            searchString,
+            pageNumber,
+            pageSize,
+            sortByOrder,
+            sortByKey
+          );
+          response?.data?.map((data: any) => {
+            data.thumbnails = JSON.parse(data?.thumbnails);
+          });
+        };
 
-      if (!response?.data) {
+        if (!response?.data) {
+          return {
+            status: "success",
+            data: [],
+          };
+        }
+
         return {
           status: "success",
-          data: [],
+          data: response?.data,
         };
-      }
-
-      return {
-        status: "success",
-        data: response?.data,
-      };
+      } 
     } catch (error: any) {
       const errorMessage = `ERROR while getting the response from DB, Cause: ${JSON.stringify(
         error?.message
