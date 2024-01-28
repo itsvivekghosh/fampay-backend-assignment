@@ -297,7 +297,6 @@ class VideoHelper {
     sortByKey: string
   ) => {
     try {
-      
       let response: any = {};
       if (searchString) {
         const cachedResult = await redisClient.get(searchString.toLowerCase());
@@ -311,32 +310,31 @@ class VideoHelper {
               data: "Can't Parse JSON Body, Cause: " + err?.message,
             };
           }
-        }
-      }
-      else {
-        response = await VideoQueries.VideoModelGetByTitleOrDescriptionQuery(
-          searchString,
-          pageNumber,
-          pageSize,
-          sortByOrder,
-          sortByKey
-        );
-        response?.data?.map((data: any) => {
-          data.thumbnails = JSON.parse(data?.thumbnails);
-        });
-      };
+        } else {
+          response = await VideoQueries.VideoModelGetByTitleOrDescriptionQuery(
+            searchString,
+            pageNumber,
+            pageSize,
+            sortByOrder,
+            sortByKey
+          );
+          response?.data?.map((data: any) => {
+            data.thumbnails = JSON.parse(data?.thumbnails);
+          });
+        };
 
-      if (!response?.data) {
+        if (!response?.data) {
+          return {
+            status: "success",
+            data: [],
+          };
+        }
+
         return {
           status: "success",
-          data: [],
+          data: response?.data,
         };
-      }
-
-      return {
-        status: "success",
-        data: response?.data,
-      };
+      } 
     } catch (error: any) {
       const errorMessage = `ERROR while getting the response from DB, Cause: ${JSON.stringify(
         error?.message
