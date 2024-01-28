@@ -300,7 +300,7 @@ class VideoHelper {
       
       let response: any = {};
       if (searchString) {
-        const cachedResult = await redisClient.get(searchString);
+        const cachedResult = await redisClient.get(searchString.toLowerCase());
         if (cachedResult) {
           try {
             response["data"] = JSON.parse(cachedResult);

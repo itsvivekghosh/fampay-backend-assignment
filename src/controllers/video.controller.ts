@@ -65,7 +65,9 @@ class VideoController {
     await videoHelper.setYoutubeVideoResponseInDatabase(resp);
 
     // Caching response data to REDIS
-    await redisClient.set(searchQuery, JSON.stringify(resp?.data));
+    if (resp && resp?.data && resp?.data?.length > 0) {
+      await redisClient.set(String(searchQuery).toLowerCase(), JSON.stringify(resp?.data));
+    }
 
     if (resp?.status !== "success") {
       return {
