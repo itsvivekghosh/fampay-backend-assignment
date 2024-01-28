@@ -326,6 +326,13 @@ class VideoHelper {
         });
       };
 
+      if (!response?.data) {
+        return {
+          status: "success",
+          data: [],
+        };
+      }
+
       return {
         status: "success",
         data: response?.data,

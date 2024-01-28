@@ -24,6 +24,10 @@ services:
             CRON_SCHEDULE_TIME: ${CRON_SCHEDULE_TIME}
             MAX_FETCH_RESULTS: ${MAX_FETCH_RESULTS}
 
+            # REDIS CONFIG
+            REDIS_PORT: ${REDIS_PORT}
+            REDIS_HOST: ${REDIS_HOST}
+
         depends_on: 
             - mongo
 
