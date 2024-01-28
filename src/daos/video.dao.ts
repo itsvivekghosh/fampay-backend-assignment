@@ -1,5 +1,6 @@
 require("dotenv").config();
 import axios, { AxiosError } from "axios";
+import { redisClient } from "../configs/redis.config";
 
 const VideoQueries = require("../queries/video.query");
 
@@ -23,6 +24,9 @@ class VideoHelper {
 
       let response: any;
       if (this.apiKey) {
+        // Handled multiple YOUTUBE_API_KEYS if the key is expired
+        this.apiKey = this.apiKey.replace(/\s/g, "");
+
         for (const apiKey of this.apiKey?.split(",")) {
           const YOUTUBE_FETCH_API_URL = `${this.apiUrl}/search?key=${apiKey}&type=video&part=snippet&maxResults=${this.maxResults}&q=${searchQuery}`;
 
@@ -43,6 +47,10 @@ class VideoHelper {
           );
           if (response?.status === 200) {
             break;
+          }
+          if (!response?.data && !response?.data?.items) {
+            // This block handles that if the data items are empty then, search with next apiKey
+            continue;
           }
         }
       } else {
@@ -289,16 +297,35 @@ class VideoHelper {
     sortByKey: string
   ) => {
     try {
-      let response = await VideoQueries.VideoModelGetByTitleOrDescriptionQuery(
-        searchString,
-        pageNumber,
-        pageSize,
-        sortByOrder,
-        sortByKey
-      );
-      response?.data?.map((data: any) => {
-        data.thumbnails = JSON.parse(data?.thumbnails);
-      });
+      
+      let response: any = {};
+      if (searchString) {
+        const cachedResult = await redisClient.get(searchString);
+        if (cachedResult) {
+          try {
+            response["data"] = JSON.parse(cachedResult);
+          } catch (err: any) {
+            console.error(err)
+            return {
+              status: "error",
+              data: "Can't Parse JSON Body, Cause: " + err?.message,
+            };
+          }
+        }
+      }
+      else {
+        response = await VideoQueries.VideoModelGetByTitleOrDescriptionQuery(
+          searchString,
+          pageNumber,
+          pageSize,
+          sortByOrder,
+          sortByKey
+        );
+        response?.data?.map((data: any) => {
+          data.thumbnails = JSON.parse(data?.thumbnails);
+        });
+      };
+
       return {
         status: "success",
         data: response?.data,

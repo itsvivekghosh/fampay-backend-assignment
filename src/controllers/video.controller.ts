@@ -1,5 +1,7 @@
 require("dotenv").config();
 import { Request, Response } from "express";
+import { redisClient } from "../configs/redis.config";
+
 const videoHelper = require("../daos/video.dao");
 
 class VideoController {
@@ -21,7 +23,7 @@ class VideoController {
 
   // Getting the Video Details from the Youtube API.
   public static async getVideoResponse(request: Request, _: Response) {
-    const searchParams = request?.query?.q || process.env.DEFAULT_SEARCH_VALUE;
+    const searchQuery = request?.query?.q || process.env.DEFAULT_SEARCH_VALUE;
     const sortByOrder = request?.query?.sortByOrder || "desc";
     const pageNumber = request?.query?.pageNumber || 1;
     const pageSize =
@@ -38,9 +40,13 @@ class VideoController {
 
     // Getting the Video List from youtube Youtube API.
     let resp = await videoHelper.getVideoListFromYoutubeV3API(
-      searchParams,
+      searchQuery,
       pageSize
     );
+
+    if (resp?.status === 'error') {
+      return resp;
+    }
 
     // Paginate the Response by Page Size and Page Number
     resp = videoHelper.paginateArrayByPageSizeAndNumber(
@@ -57,6 +63,9 @@ class VideoController {
 
     // Appending the response in Database
     await videoHelper.setYoutubeVideoResponseInDatabase(resp);
+
+    // Caching response data to REDIS
+    await redisClient.set(searchQuery, JSON.stringify(resp?.data));
 
     if (resp?.status !== "success") {
       return {
